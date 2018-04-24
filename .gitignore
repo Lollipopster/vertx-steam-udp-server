@@ -27,3 +27,4 @@ nbdist/
 #Logs#
 *.log
 application-prod.properties
+*.mvn
