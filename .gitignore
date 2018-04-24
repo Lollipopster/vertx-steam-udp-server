@@ -28,3 +28,4 @@ nbdist/
 *.log
 application-prod.properties
 *.mvn
+mvn*

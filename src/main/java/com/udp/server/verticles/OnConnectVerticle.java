@@ -25,10 +25,8 @@ public final class OnConnectVerticle extends AbstractVerticle{
 
     private final ParsedLogBody body;
 
-    private final
-
     @Autowired
-    private OnConnectVerticle(@ParserQualifier(type = OnConnect)
+    public OnConnectVerticle(@ParserQualifier(type = OnConnect)
                               final ParsedLogBody body) {
         this.body = body;
     }
