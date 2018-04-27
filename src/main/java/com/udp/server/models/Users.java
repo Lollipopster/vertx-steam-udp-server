@@ -40,6 +40,9 @@ public class Users implements Serializable {
     @Column(name = "steam_id")
     private String steamId;
 
+    @Column(name = "disconnect_duration",columnDefinition = "int not null default 0")
+    private int disconnectDuration;
+
     @Column(name = "in_white_list")
     private boolean inWhiteList;
 

@@ -43,5 +43,8 @@ public class CsMatch implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTime;
 
+    @Column(name = "users")
+    private String users;
+
     
 }
