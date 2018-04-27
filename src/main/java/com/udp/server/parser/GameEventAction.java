@@ -2,6 +2,7 @@ package com.udp.server.parser;
 
 import com.udp.server.ParsedLogBody;
 import io.vertx.core.json.JsonObject;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,8 +10,9 @@ import org.springframework.stereotype.Component;
  * @author strogiyotec
  */
 @Component
-@ParserQualifier(type = ParserQualifier.ParserType.OnConnect)
-public final class ParsedOnConnectBody implements ParsedLogBody{
+@Primary
+@ParserQualifier(type = ParserQualifier.ParserType.GameEvent)
+public final class GameEventAction implements ParsedLogBody{
 
     @Override
     public JsonObject get(final String body) {

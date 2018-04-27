@@ -18,6 +18,6 @@ public @interface ParserQualifier {
     ParserType type();
     
     public enum ParserType {
-        OnConnect, OnDisconnect
+        GameEvent
     }
 }

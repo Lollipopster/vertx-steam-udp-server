@@ -6,6 +6,7 @@ import com.udp.server.repository.UserRepository;
 import com.udp.server.service.DateService;
 import com.udp.server.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.Date;
 @Transactional(rollbackFor = Exception.class)
 @Service
 @AllArgsConstructor
+@Slf4j
 public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -26,43 +28,39 @@ public class DefaultUserService implements UserService {
     @Override
     public Users onConnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId);
-        if (user != null && this.shouldBan(user)) {
-            this.banUser(user);
-        } else{
-
-        }
-        return null;
-    }
-
-    private void banUser(final Users user) {
-            switch (user.getAttempts()) {
-                case 0: {
-                    final Date toBan = new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60));
-                    user.setAttempts(1);
-                    user.setLastTry(toBan);
-                    this.userRepository.save(user);
-                }
-                case 1: {
-                    final Date toBan = new Date(System.currentTimeMillis() + (ONE_MINUTE_IN_MILLIS * 1440));
-                    user.setAttempts(2);
-                    user.setLastTry(toBan);
-                    this.userRepository.save(user);
-                }
-                case 2: {
-                    final Date toBan = new Date(System.currentTimeMillis() + (3 * ONE_MINUTE_IN_MILLIS * 1440));
-                    user.setAttempts(3);
-                    user.setLastTry(toBan);
-                    this.userRepository.save(user);
-                }
-                default: {
-                    final Date toBan = new Date(System.currentTimeMillis() + (7 * ONE_MINUTE_IN_MILLIS * 1440));
-                    user.setAttempts(4);
-                    user.setLastTry(toBan);
-                    this.userRepository.save(user);
-                }
+        if(user != null && user.getDisconnectDate() != null){
+            final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
+            final int disconnectDuration = user.getDisconnectDuration() + period.getMinutes();
+            if(disconnectDuration >=5){
+                user.setDisconnectDuration(0);
+                user.setDisconnectDate(null);
+                user.setAttempts(1);
+                user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS *60)));
+                log.warn("User {} will be banned by UDP",steamId);
+            } else{
+                user.setDisconnectDuration(disconnectDuration);
+                log.warn("User {} disconnected for {} minutes",steamId,disconnectDuration);
             }
+            this.userRepository.save(user);
+        }
+        return user;
     }
 
+    @Override
+    public Users onDisconnectAction(final String steamId) {
+        final Users user = this.userRepository.findBySteamId(steamId);
+        if(user != null) {
+            user.setDisconnectDate(new Date());
+            this.userRepository.save(user);
+            log.warn("User with steamId {} is disconnected",steamId);
+        }
+        return user;
+    }
+
+
+    private void addDisconnectTimeToUser(final Users user){
+
+    }
 
     private boolean shouldBan(final Users user) {
         final boolean shouldBan;

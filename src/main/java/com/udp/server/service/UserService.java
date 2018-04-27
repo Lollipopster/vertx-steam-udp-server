@@ -6,4 +6,5 @@ public interface UserService {
 
     Users onConnectAction(String steamId);
 
+    Users onDisconnectAction(String steamId);
 }
