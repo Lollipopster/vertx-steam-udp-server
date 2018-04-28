@@ -25,6 +25,12 @@ public class DefaultUserService implements UserService {
 
     private static final long ONE_MINUTE_IN_MILLIS=60000;
 
+    /**
+     * This method ban user for
+     * 2 hours if disconnect time bigger than 5
+     * @param steamId of user
+     * @return user with this steam id
+     */
     @Override
     public Users onConnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId);

@@ -32,6 +32,7 @@ public final class OnMatchBeginVerticle extends AbstractVerticle{
             eventBus.<String>consumer(Addresses.BEGIN_MATCH.asString(), handler->{
                 final String body = handler.body();
                 final JsonObject resJO = this.json.asJson(body);
+                System.out.println(resJO.toString());
                 final int matchId = Integer.parseInt(resJO.getString("matchid"));
                 this.matchService.beginMatch(matchId);
                 log.info("Match [{}] is started",matchId);

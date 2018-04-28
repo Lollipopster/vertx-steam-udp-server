@@ -34,7 +34,6 @@ public final class OnEndMatchVerticle extends AbstractVerticle {
                 final JsonObject resJO = this.json.asJson(body);
                 final int matchId = Integer.parseInt(resJO.getString("matchid"));
                 this.matchService.endMatch(matchId);
-                log.info("Match [{}] is ended",matchId);
              });
         
     }

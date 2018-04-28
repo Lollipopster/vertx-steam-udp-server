@@ -25,7 +25,7 @@ public final class UdpServerVerticle extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         final DatagramSocket socket = this.vertx.createDatagramSocket(new DatagramSocketOptions());
-        socket.listen(9000, "0.0.0.0", asyncRes -> {
+        socket.listen(9000, "127.0.0.1", asyncRes -> {
             if (asyncRes.succeeded()) {
                 socket.handler(packet -> {
                     final byte[] bytes = packet.data().getBytes(0, packet.data().length());
@@ -62,7 +62,7 @@ public final class UdpServerVerticle extends AbstractVerticle {
      * @param address where message will be written
      */
     private void sendToEventBus(final String message,final Addresses address){
-        log.info("Message {} will be transfered to addres",message,address.asString());
+        log.info("Message {} will be transfered to address {}",message,address.asString());
         final EventBus eventBus = this.vertx.eventBus();
         eventBus.send(address.asString(), message);
     }

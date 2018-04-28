@@ -54,7 +54,7 @@ public class DefaultMatchService implements MatchService{
        final List<CsMatch> matches= this.matchRepository.findByMatchIdOrderByCreationTimeDesc(matchId);
         if(!matches.isEmpty()) {
             final CsMatch match = matches.get(0);
-            log.info("MAtch with id [{}] is ended by udp",match.getMatchId());
+            log.info("Match with id [{}] is ended by udp",match.getMatchId());
             match.setBegin(false);
             this.matchRepository.save(match);
             this.unblockUsersFromMatch(match);
@@ -69,9 +69,8 @@ public class DefaultMatchService implements MatchService{
             log.warn("Match [{}] doesn't has users",match.getId());
         } else{
             final List<Users> users = this.userRepository.findBySteamIdIn(steamIds);
-            steamIds.clear();
             if(!this.notEmptyAndSize10(users)){
-                log.warn("Users size in match {} is not 10 but {}",match.getId(),users.size());
+                log.warn("Users size in match {} is not 10, but {}",match.getId(),users.size());
             } else{
                  this.unBlockUsers(users);
             }
@@ -82,7 +81,7 @@ public class DefaultMatchService implements MatchService{
         final List<Users> unBanedusers = users.stream()
                                               .filter(user -> user.getLastTry() == null)
                                               .collect(Collectors.toList());
-        log.info("Users to be unhandlerd from match");
+        this.logUsersToBeUnhandledFromMatch(users);
         for(final Users user : unBanedusers){
             user.setDisconnectDate(null);
             user.setDisconnectDuration(0);
@@ -91,8 +90,15 @@ public class DefaultMatchService implements MatchService{
         this.userRepository.save(unBanedusers);
     }
 
+    private void logUsersToBeUnhandledFromMatch(final List<Users> users){
+        final String joinedIds = users.stream()
+                .map(Users::getSteamId)
+                .collect(Collectors.joining(","));
+        log.info("Users to be unhandled from match: {}",joinedIds);
+    }
+
     private boolean notEmptyAndSize10(final List<? extends Object> list){
-            return !list.isEmpty() && list.size() == 10;
+            return !list.isEmpty();
     }
     
 }
