@@ -40,6 +40,10 @@ public class VertxUdpServerApplication implements CommandLineRunner {
     @Autowired
     @VertexQualifier(event = VertxType.MATCH_END)
     private AbstractVerticle end;
+
+    @Autowired
+    @VertexQualifier(event = VertxType.JDBC)
+    private AbstractVerticle jdbc;
     
     
     public static void main(String[] args) {
@@ -54,6 +58,7 @@ public class VertxUdpServerApplication implements CommandLineRunner {
         vertx.deployVerticle(this.disconnect,new DeploymentOptions().setWorker(true));
         vertx.deployVerticle(this.end,new DeploymentOptions().setWorker(true));
         vertx.deployVerticle(this.udp);
+        vertx.deployVerticle(this.jdbc);
         log.info("Server in port : [{}] is started",9000);
     }
 }

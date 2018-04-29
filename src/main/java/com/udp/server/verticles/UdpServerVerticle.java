@@ -25,7 +25,7 @@ public final class UdpServerVerticle extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         final DatagramSocket socket = this.vertx.createDatagramSocket(new DatagramSocketOptions());
-        socket.listen(9000, "127.0.0.1", asyncRes -> {
+        socket.listen(9000, "0.0.0.0", asyncRes -> {
             if (asyncRes.succeeded()) {
                 socket.handler(packet -> {
                     final byte[] bytes = packet.data().getBytes(0, packet.data().length());

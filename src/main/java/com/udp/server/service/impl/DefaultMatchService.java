@@ -34,19 +34,12 @@ public class DefaultMatchService implements MatchService{
         final List<CsMatch> matches= this.matchRepository.findByMatchIdOrderByCreationTimeDesc(matchId);
         if(!matches.isEmpty()) {
             final CsMatch match = matches.get(0);
-            log.info("MAtch with id [{}] is started",match.getMatchId());
+            log.info("Match with id [{}] is started",match.getMatchId());
             match.setBegin(true);
             this.matchRepository.save(match);
         } else{
-            log.info("There is no matches with id : [{}]",matchId);
+            log.warn("There is no matches with id : [{}]",matchId);
         }
-    }
-
-    @Override
-    public List<CsMatch> matches() {
-        final List<CsMatch> matches = new ArrayList<>();
-        this.matchRepository.findAll().forEach(matches::add);
-        return matches;
     }
 
     @Override
@@ -61,6 +54,20 @@ public class DefaultMatchService implements MatchService{
         } else{
             log.info("There is no matches with id : [{}]",matchId);
         }
+    }
+
+    @Override
+    public int endNewMatches(final int lastMatchId) {
+        final List<CsMatch> lastMatches = this.matchRepository.findByMatchIdGreaterThanOrderByMatchIdDesc(lastMatchId);
+        if(!lastMatches.isEmpty()) {
+            lastMatches.forEach(match->match.setBegin(false));
+            this.matchRepository.save(lastMatches);
+            final int matchId = lastMatches.get(0).getMatchId();
+            log.info("Last matchId from ban DB: {}",matchId);
+            return matchId;
+        }
+        return 0;
+
     }
 
     private void unblockUsersFromMatch(final CsMatch match){
@@ -98,7 +105,7 @@ public class DefaultMatchService implements MatchService{
     }
 
     private boolean notEmptyAndSize10(final List<? extends Object> list){
-            return !list.isEmpty();
+            return !list.isEmpty() && list.size() == 10;
     }
     
 }

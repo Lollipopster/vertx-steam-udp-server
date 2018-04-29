@@ -9,8 +9,8 @@ import java.util.List;
  */
 public interface MatchService {
     void beginMatch(final int matchId);
-    
-    List<CsMatch> matches();
-    
+
     void endMatch(int matchId);
+
+    int endNewMatches(int lastMatchId);
 }
