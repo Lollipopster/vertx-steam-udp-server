@@ -44,7 +44,7 @@ public final class JdbcVerticle extends AbstractVerticle implements CronJob{
 
     @Override
     public void execute() {
-        this.vertx.setPeriodic(3000, handler->{
+        this.vertx.setPeriodic(JdbcVerticle.FIFTEEN_MIN_IN_MILLIS, handler->{
             log.info("Job to end matches is started");
             final int i = this.matchService.endNewMatches(this.lastMatchId);
             if(i != 0) {
