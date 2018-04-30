@@ -75,7 +75,7 @@ public final class JdbcVerticle extends AbstractVerticle implements CronJob{
             log.error("Can't make select statement from JdbcVerticle",rs.cause());
         } else{
             this.lastMatchId = rs.result().getResults().get(0).getInteger(0);
-            System.out.println(this.lastMatchId);
+            log.info("On startup last matchid is : {}",this.lastMatchId);
         }
     }
 }

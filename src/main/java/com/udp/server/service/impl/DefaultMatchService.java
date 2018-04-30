@@ -63,6 +63,10 @@ public class DefaultMatchService implements MatchService{
             lastMatches.forEach(match->match.setBegin(false));
             this.matchRepository.save(lastMatches);
             final int matchId = lastMatches.get(0).getMatchId();
+            log.info("Matches to be ended by udp: {}",lastMatches.stream()
+                                                                 .map(CsMatch::getMatchId)
+                                                                 .map(String::valueOf)
+                                                                 .collect(Collectors.joining(",")));
             log.info("Last matchId from ban DB: {}",matchId);
             return matchId;
         }
@@ -71,14 +75,19 @@ public class DefaultMatchService implements MatchService{
     }
 
     private void unblockUsersFromMatch(final CsMatch match){
+        if(match.getUsers() == null){
+            log.warn("Match {} doesn't has users",match.getMatchId());
+            return;
+        }
         final List<String> steamIds = Arrays.asList(match.getUsers().split(","));
         if(!this.notEmptyAndSize10(steamIds)){
-            log.warn("Match [{}] doesn't has users",match.getId());
+            log.warn("Match [{}] doesn't has 10 users",match.getId());
         } else{
             final List<Users> users = this.userRepository.findBySteamIdIn(steamIds);
             if(!this.notEmptyAndSize10(users)){
                 log.warn("Users size in match {} is not 10, but {}",match.getId(),users.size());
             } else{
+                this.logUsersToBeUnhandledFromMatch(match.getMatchId(),users);
                  this.unBlockUsers(users);
             }
         }
@@ -88,20 +97,18 @@ public class DefaultMatchService implements MatchService{
         final List<Users> unBanedusers = users.stream()
                                               .filter(user -> user.getLastTry() == null)
                                               .collect(Collectors.toList());
-        this.logUsersToBeUnhandledFromMatch(users);
         for(final Users user : unBanedusers){
             user.setDisconnectDate(null);
             user.setDisconnectDuration(0);
-            log.info("With steamId {}",user.getSteamId());
         }
         this.userRepository.save(unBanedusers);
     }
 
-    private void logUsersToBeUnhandledFromMatch(final List<Users> users){
+    private void logUsersToBeUnhandledFromMatch(final int matchId,final List<Users> users){
         final String joinedIds = users.stream()
                 .map(Users::getSteamId)
                 .collect(Collectors.joining(","));
-        log.info("Users to be unhandled from match: {}",joinedIds);
+        log.info("Users to be unhandled from match with id {} : {}",matchId,joinedIds);
     }
 
     private boolean notEmptyAndSize10(final List<? extends Object> list){

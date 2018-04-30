@@ -33,6 +33,7 @@ public class DefaultUserService implements UserService {
      */
     @Override
     public Users onConnectAction(final String steamId) {
+        log.info("User with steamId {} connected",steamId);
         final Users user = this.userRepository.findBySteamId(steamId);
         if(user != null && user.getDisconnectDate() != null){
             final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
