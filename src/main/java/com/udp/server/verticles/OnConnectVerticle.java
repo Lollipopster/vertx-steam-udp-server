@@ -32,7 +32,15 @@ public final class OnConnectVerticle extends AbstractVerticle{
            eventBus.<String>consumer(Addresses.CONNECT.asString(), handler->{
                 final String body = handler.body();
                 final JsonObject jsonBody = this.body.get(body);
-                this.userService.onConnectAction(jsonBody.getString("steamId"));
+                this.vertx.executeBlocking(future->{
+                    this.userService.onConnectAction(jsonBody.getString("steamId"));
+                    future.complete();
+                },false,asyncResult -> {
+                    if(asyncResult.failed()){
+                        log.error("Error while OnConnectAction",asyncResult.cause());
+                    }
+                });
+
             });    
     }
 

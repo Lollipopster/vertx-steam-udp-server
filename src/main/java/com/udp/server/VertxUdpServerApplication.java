@@ -52,11 +52,11 @@ public class VertxUdpServerApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {    
-        final Vertx vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(10));
-        vertx.deployVerticle(this.begin,new DeploymentOptions().setWorker(true));
-        vertx.deployVerticle(this.connect,new DeploymentOptions().setWorker(true));
-        vertx.deployVerticle(this.disconnect,new DeploymentOptions().setWorker(true));
-        vertx.deployVerticle(this.end,new DeploymentOptions().setWorker(true));
+        final Vertx vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(20));
+        vertx.deployVerticle(this.begin);
+        vertx.deployVerticle(this.connect);
+        vertx.deployVerticle(this.disconnect);
+        vertx.deployVerticle(this.end);
         vertx.deployVerticle(this.udp);
         vertx.deployVerticle(this.jdbc);
         log.info("Server in port : [{}] is started",9000);

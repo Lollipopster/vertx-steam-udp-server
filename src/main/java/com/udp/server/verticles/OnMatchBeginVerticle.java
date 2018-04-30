@@ -33,7 +33,14 @@ public final class OnMatchBeginVerticle extends AbstractVerticle{
                 final String body = handler.body();
                 final JsonObject resJO = this.json.asJson(body);
                 final int matchId = Integer.parseInt(resJO.getString("matchid"));
-                this.matchService.beginMatch(matchId);
+                this.vertx.executeBlocking(future -> {
+                    this.matchService.beginMatch(matchId);
+                    future.complete();
+                },false,asyncResult -> {
+                    if(asyncResult.failed()){
+                        log.error("Error while beginMatch",asyncResult.cause());
+                    }
+                });
            });
     }
 }
