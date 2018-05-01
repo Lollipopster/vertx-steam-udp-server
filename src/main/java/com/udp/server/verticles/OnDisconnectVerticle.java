@@ -33,14 +33,16 @@ public final class OnDisconnectVerticle extends AbstractVerticle{
          eventBus.<String>consumer(Addresses.DISCONNECT.asString(), handler->{
              final String body = handler.body();
              final JsonObject resJO = this.parsedLogBody.get(body);
-             this.vertx.executeBlocking(future->{
-                 this.userService.onDisconnectAction(resJO.getString("steamId"));
-                 future.complete();
-             },false,asyncResult->{
-                 if(asyncResult.failed()){
-                     log.error("Error while onDisconnectAction",asyncResult.cause());
-                 }
-             });
+             if(resJO != null){
+                 this.vertx.executeBlocking(future->{
+                     this.userService.onDisconnectAction(resJO.getString("steamId"));
+                     future.complete();
+                 },false,asyncResult->{
+                     if(asyncResult.failed()){
+                         log.error("Error while onDisconnectAction",asyncResult.cause());
+                     }
+                 });
+             }
             });
         
     }

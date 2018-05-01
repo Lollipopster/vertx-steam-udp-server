@@ -13,14 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- *
  * @author strogiyotec
  */
 @Component
 @VertexQualifier(event = VertxType.CONNECT)
 @Slf4j
 @AllArgsConstructor
-public final class OnConnectVerticle extends AbstractVerticle{
+public final class OnConnectVerticle extends AbstractVerticle {
 
     private final ParsedLogBody body;
 
@@ -29,19 +28,20 @@ public final class OnConnectVerticle extends AbstractVerticle{
     @Override
     public void start() throws Exception {
         final EventBus eventBus = this.vertx.eventBus();
-           eventBus.<String>consumer(Addresses.CONNECT.asString(), handler->{
-                final String body = handler.body();
-                final JsonObject jsonBody = this.body.get(body);
-                this.vertx.executeBlocking(future->{
+        eventBus.<String>consumer(Addresses.CONNECT.asString(), handler -> {
+            final String body = handler.body();
+            final JsonObject jsonBody = this.body.get(body);
+            if (jsonBody != null) {
+                this.vertx.executeBlocking(future -> {
                     this.userService.onConnectAction(jsonBody.getString("steamId"));
                     future.complete();
-                },false,asyncResult -> {
-                    if(asyncResult.failed()){
-                        log.error("Error while OnConnectAction",asyncResult.cause());
+                }, false, asyncResult -> {
+                    if (asyncResult.failed()) {
+                        log.error("Error while OnConnectAction", asyncResult.cause());
                     }
                 });
-
-            });    
+            }
+        });
     }
 
 

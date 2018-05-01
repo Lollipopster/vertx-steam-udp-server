@@ -19,6 +19,9 @@ public final class GameEventAction implements ParsedLogBody{
     @Override
     public JsonObject get(final String body) {
         log.info("Try to parse body {}",body);
+        if(body.contains("BOT")){
+            return null;
+        }
         final String startFromSteamId = body.substring(body.indexOf("STEAM"),body.length());
         final String onlySteamId = startFromSteamId.substring(0,startFromSteamId.indexOf(">"));
         return new JsonObject().put("steamId",onlySteamId);
