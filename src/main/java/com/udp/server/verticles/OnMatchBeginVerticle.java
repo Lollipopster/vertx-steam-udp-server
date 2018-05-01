@@ -40,6 +40,7 @@ public final class OnMatchBeginVerticle extends AbstractVerticle{
                     if(asyncResult.failed()){
                         log.error("Error while beginMatch",asyncResult.cause());
                     }
+
                 });
            });
     }
