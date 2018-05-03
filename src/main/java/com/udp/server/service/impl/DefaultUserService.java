@@ -64,23 +64,4 @@ public class DefaultUserService implements UserService {
         return user;
     }
 
-
-    private void addDisconnectTimeToUser(final Users user){
-
-    }
-
-    private boolean shouldBan(final Users user) {
-        final boolean shouldBan;
-        final Date now = new Date();
-        final Date from = user.getDisconnectDate();
-        if (from != null && user.getDisconnectDate().compareTo(now) < 0) {
-            final Period period = this.dateService.periodBetwean(from, now);
-            shouldBan = period.getMinutes() >= 5;
-        } else {
-            shouldBan = false;
-        }
-        return shouldBan;
-    }
-
-
 }
