@@ -104,7 +104,7 @@ public class DefaultMatchService implements MatchService{
 
     private void unBlockUsers(final List<Users> users){
         for (final Users user : users) {
-            if(user.getLastTry() == null){
+            if(user.getLastTry() == null && user.getDisconnectDate() != null){
                 final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
                 final int disconnectDuration = period.getMinutes();
                 if(disconnectDuration >= UserService.DURATION_BEFORE_BAN){
