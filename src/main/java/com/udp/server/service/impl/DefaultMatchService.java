@@ -88,7 +88,7 @@ public class DefaultMatchService implements MatchService{
                 log.warn("Users size in match {} is not 10, but {}",match.getId(),users.size());
             } else{
                 this.logUsersToBeUnhandledFromMatch(match.getMatchId(),users);
-                 this.unBlockUsers(users);
+                this.unBlockUsers(users);
             }
         }
     }
