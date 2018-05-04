@@ -4,14 +4,17 @@ import com.udp.server.models.CsMatch;
 import com.udp.server.models.Users;
 import com.udp.server.repository.MatchRepository;
 import com.udp.server.repository.UserRepository;
+import com.udp.server.service.DateService;
 import com.udp.server.service.MatchService;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.udp.server.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +27,16 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class DefaultMatchService implements MatchService{
-    
+
     private final MatchRepository matchRepository;
 
     private final UserRepository userRepository;
-    
+
+    private final DateService dateService;
+
+    private static final long ONE_MINUTE_IN_MILLIS=60000;
+
+
     @Override
     public void beginMatch(final int matchId) {
         final List<CsMatch> matches= this.matchRepository.findByMatchIdOrderByCreationTimeDesc(matchId);
@@ -50,7 +58,7 @@ public class DefaultMatchService implements MatchService{
             log.info("Match with id [{}] is ended by udp",match.getMatchId());
             match.setBegin(false);
             this.matchRepository.save(match);
-            this.unblockUsersFromMatch(match);
+            this.handleUsersInMatch(match);
         } else{
             log.info("There is no matches with id : [{}]",matchId);
         }
@@ -74,7 +82,7 @@ public class DefaultMatchService implements MatchService{
 
     }
 
-    private void unblockUsersFromMatch(final CsMatch match){
+    private void handleUsersInMatch(final CsMatch match){
         if(match.getUsers() == null){
             log.warn("Match {} doesn't has users",match.getMatchId());
             return;
@@ -93,15 +101,26 @@ public class DefaultMatchService implements MatchService{
         }
     }
 
+
     private void unBlockUsers(final List<Users> users){
-        final List<Users> unBanedusers = users.stream()
-                                              .filter(user -> user.getLastTry() == null)
-                                              .collect(Collectors.toList());
-        for(final Users user : unBanedusers){
-            user.setDisconnectDate(null);
-            user.setDisconnectDuration(0);
+        for (final Users user : users) {
+            if(user.getLastTry() == null){
+                final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
+                final int disconnectDuration = period.getMinutes();
+                if(disconnectDuration >= UserService.DURATION_BEFORE_BAN){
+                    user.setDisconnectDuration(0);
+                    user.setDisconnectDate(null);
+                    user.setAttempts(1);
+                    user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS *60)));
+                    log.warn("User {} will be banned by UDP when match is end", user.getSteamId());
+                } else{
+                    user.setDisconnectDuration(0);
+                    user.setDisconnectDate(null);
+                    log.warn("User {} disconnected for {} minutes",user.getSteamId(),disconnectDuration);
+                }
+            }
         }
-        this.userRepository.save(unBanedusers);
+        this.userRepository.save(users);
     }
 
     private void logUsersToBeUnhandledFromMatch(final int matchId,final List<Users> users){
@@ -112,7 +131,7 @@ public class DefaultMatchService implements MatchService{
     }
 
     private boolean notEmptyAndSize10(final List<? extends Object> list){
-            return !list.isEmpty() && list.size() == 10;
+        return !list.isEmpty() && list.size() == 10;
     }
-    
+
 }
