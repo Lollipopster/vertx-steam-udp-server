@@ -18,7 +18,6 @@ public final class GameEventAction implements ParsedLogBody{
 
     @Override
     public JsonObject get(final String body) {
-        log.info("Try to parse body {}",body);
         if(body.contains("BOT")){
             return null;
         }

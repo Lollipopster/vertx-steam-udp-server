@@ -62,7 +62,6 @@ public final class UdpServerVerticle extends AbstractVerticle {
      * @param address where message will be written
      */
     private void sendToEventBus(final String message,final Addresses address){
-        log.info("Message {} will be transfered to address {}",message,address.asString());
         final EventBus eventBus = this.vertx.eventBus();
         eventBus.send(address.asString(), message);
     }
