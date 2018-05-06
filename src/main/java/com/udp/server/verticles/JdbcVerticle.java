@@ -33,19 +33,22 @@ public final class JdbcVerticle extends AbstractVerticle implements CronJob{
 
     private final MatchService matchService;
 
-    private  final JDBCClient jdbcClient;
+    private JDBCClient jdbcClient;
+
+    private final Environment environment;
 
     public JdbcVerticle(final MatchService matchService,final Environment environment) {
         this.matchService = matchService;
-        this.jdbcClient = JDBCClient.createShared(this.vertx, new JsonObject()
-                .put("url", environment.getProperty("get5match.db.url"))
-                .put("driver_class", "com.mysql.jdbc.Driver")
-                .put("user", environment.getProperty("spring.datasource.username"))
-                .put("password", environment.getProperty("spring.datasource.password")));
+        this.environment = environment;
     }
 
     @Override
     public void start() throws Exception {
+        this.jdbcClient = JDBCClient.createShared(this.vertx, new JsonObject()
+                .put("url", this.environment.getProperty("get5match.db.url"))
+                .put("driver_class", "com.mysql.jdbc.Driver")
+                .put("user", this.environment.getProperty("spring.datasource.username"))
+                .put("password", this.environment.getProperty("spring.datasource.password")));
         this.initLastMatchId();
         this.execute();
     }
