@@ -104,6 +104,7 @@ public class DefaultMatchService implements MatchService{
 
     private void unBlockUsers(final List<Users> users){
         for (final Users user : users) {
+            user.setInMatch(false);
             if(user.getLastTry() == null && user.getDisconnectDate() != null){
                 final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
                 final int disconnectDuration = period.getMinutes();
@@ -116,7 +117,6 @@ public class DefaultMatchService implements MatchService{
                 } else{
                     user.setDisconnectDuration(0);
                     user.setDisconnectDate(null);
-                    user.setInMatch(false);
                     log.warn("User {} disconnected for {} minutes",user.getSteamId(),disconnectDuration);
                 }
             }
