@@ -65,8 +65,8 @@ public class DefaultMatchService implements MatchService{
     }
 
     @Override
-    public int endNewMatches(final int lastMatchId) {
-        final List<CsMatch> lastMatches = this.matchRepository.findByMatchIdGreaterThanOrderByMatchIdDesc(lastMatchId);
+    public int endNewMatches(final List<Integer> endedMatches) {
+        final List<CsMatch> lastMatches = this.matchRepository.findByMatchIdInOrOrderByMatchIdDesc(endedMatches);
         if(!lastMatches.isEmpty()) {
             lastMatches.forEach(match->match.setBegin(false));
             this.matchRepository.save(lastMatches);

@@ -12,5 +12,5 @@ public interface MatchService {
 
     void endMatch(int matchId);
 
-    int endNewMatches(int lastMatchId);
+    int endNewMatches(List<Integer> endedMatches);
 }

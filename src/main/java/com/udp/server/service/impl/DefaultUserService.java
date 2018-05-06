@@ -25,13 +25,6 @@ public class DefaultUserService implements UserService {
 
     private static final long ONE_MINUTE_IN_MILLIS = 60000;
 
-    /**
-     * This method ban user for
-     * 2 hours if disconnect time bigger than 5
-     *
-     * @param steamId of user
-     * @return user with this steam id
-     */
     @Override
     public Users onConnectAction(final String steamId) {
         log.info("User with steamId {} connected", steamId);
@@ -46,9 +39,9 @@ public class DefaultUserService implements UserService {
                     user.setDisconnectDate(null);
                     user.setAttempts(1);
                     user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
-                    log.warn("User {} will be banned by UDP \n Disconnect duration {}", steamId, disconnectDuration);
+                    log.warn("User {} will be banned by UDP \n Time : [{}]", steamId, new Date());
                 } else {
-                    user.setDisconnectDuration(disconnectDuration);
+                    user.setDisconnectDuration(disconnectDuration+user.getDisconnectDuration());
                     log.warn("User {} disconnected for {} minutes", steamId, disconnectDuration);
                 }
                 this.userRepository.save(user);
@@ -61,9 +54,10 @@ public class DefaultUserService implements UserService {
     public Users onDisconnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1", "STEAM_0"));
         if (user != null && user.isInMatch()) {
-            user.setDisconnectDate(new Date());
+            final Date now = new Date();
+            user.setDisconnectDate(now);
             this.userRepository.save(user);
-            log.warn("User with steamId {} is disconnected", steamId);
+            log.warn("User with steamId {} is disconnected Time : [{}]", steamId,now.toString());
         }
         return user;
     }
