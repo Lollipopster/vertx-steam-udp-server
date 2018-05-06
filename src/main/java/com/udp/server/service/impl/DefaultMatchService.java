@@ -116,6 +116,7 @@ public class DefaultMatchService implements MatchService{
                 } else{
                     user.setDisconnectDuration(0);
                     user.setDisconnectDate(null);
+                    user.setInMatch(false);
                     log.warn("User {} disconnected for {} minutes",user.getSteamId(),disconnectDuration);
                 }
             }

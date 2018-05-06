@@ -56,7 +56,7 @@ public class DefaultUserService implements UserService {
     @Override
     public Users onDisconnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1","STEAM_0"));
-        if(user != null) {
+        if(user != null && user.isInMatch()) {
             user.setDisconnectDate(new Date());
             this.userRepository.save(user);
             log.warn("User with steamId {} is disconnected",steamId);

@@ -69,5 +69,8 @@ public class Users implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date disconnectDate;
 
+    @Column(name = "in_match",nullable = false)
+    private boolean inMatch;
+
 
 }
