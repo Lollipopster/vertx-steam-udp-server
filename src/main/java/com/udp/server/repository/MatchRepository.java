@@ -16,5 +16,5 @@ public interface MatchRepository extends CrudRepository<CsMatch, Integer> {
 
     List<CsMatch> findByMatchIdGreaterThanOrderByMatchIdDesc(int matchId);
 
-    List<CsMatch> findByMatchIdInOrOrderByMatchIdDesc(List<Integer> matches);
+    List<CsMatch> findByMatchIdInOrderByMatchIdDesc(List<Integer> matches);
 }
