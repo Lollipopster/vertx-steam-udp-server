@@ -37,13 +37,13 @@ public class DefaultUserService implements UserService {
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1","STEAM_0"));
         if(user != null && user.getDisconnectDate() != null){
             final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
-            final int disconnectDuration = user.getDisconnectDuration() + period.getMinutes();
+            final int disconnectDuration = period.getMinutes();
             if(disconnectDuration >=UserService.DURATION_BEFORE_BAN){
                 user.setDisconnectDuration(0);
                 user.setDisconnectDate(null);
                 user.setAttempts(1);
                 user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS *60)));
-                log.warn("User {} will be banned by UDP",steamId);
+                log.warn("User {} will be banned by UDP \n Disconnect duration {}",steamId,disconnectDuration);
             } else{
                 user.setDisconnectDuration(disconnectDuration);
                 log.warn("User {} disconnected for {} minutes",steamId,disconnectDuration);

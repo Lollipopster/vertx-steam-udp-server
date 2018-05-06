@@ -93,7 +93,7 @@ public class DefaultMatchService implements MatchService{
         } else{
             final List<Users> users = this.userRepository.findBySteamIdIn(steamIds);
             if(!this.notEmptyAndSize10(users)){
-                log.warn("Users size in match {} is not 10, but {}",match.getId(),users.size());
+                log.warn("Users size in match {} is not 10, actual {}",match.getId(),users.size());
             } else{
                 this.logUsersToBeUnhandledFromMatch(match.getMatchId(),users);
                 this.unBlockUsers(users);
