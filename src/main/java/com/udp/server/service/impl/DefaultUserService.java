@@ -41,7 +41,7 @@ public class DefaultUserService implements UserService {
                     user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
                     log.warn("User {} will be banned by UDP \n Time : [{}]", steamId, new Date());
                 } else {
-                    user.setDisconnectDuration(disconnectDuration+user.getDisconnectDuration());
+                    user.setDisconnectDuration(disconnectDuration);
                     log.warn("User {} disconnected for {} minutes", steamId, disconnectDuration);
                 }
                 this.userRepository.save(user);
