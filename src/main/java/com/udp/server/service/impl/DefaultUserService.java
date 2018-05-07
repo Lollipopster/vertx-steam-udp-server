@@ -40,12 +40,12 @@ public class DefaultUserService implements UserService {
                     user.setDisconnectDuration(0);
                     user.setDisconnectDate(null);
                     user.setAttempts(1);
-                   // user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
+                    user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
                     log.warn("User {} will be banned by UDP Duration : [{}]", steamId, disconnectDuration);
                 } else {
                     final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
                     user.setDisconnectDuration(updatedDiscTime);
-                    log.warn("Update user disconnect time to {}", steamId, updatedDiscTime);
+                    log.warn("Update user {} disconnect time to {}", steamId, updatedDiscTime);
                 }
                 this.userRepository.save(user);
             }
