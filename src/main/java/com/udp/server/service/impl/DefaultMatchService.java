@@ -113,7 +113,7 @@ public class DefaultMatchService implements MatchService{
                     user.setDisconnectDate(null);
                     user.setAttempts(1);
                   //  user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS *60)));
-                    log.warn("User {} will be banned by UDP when match is end", user.getSteamId());
+                    log.warn("User {} will be banned by UDP when match is end Last disc time : []", user.getSteamId(),user.getDisconnectDate());
                 } else{
                     user.setDisconnectDuration(0);
                     user.setDisconnectDate(null);

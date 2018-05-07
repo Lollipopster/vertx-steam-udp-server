@@ -27,22 +27,25 @@ public class DefaultUserService implements UserService {
 
     @Override
     public Users onConnectAction(final String steamId) {
-        log.info("User with steamId {} connected", steamId);
+        final Date now = new Date();
+        log.info("User with steamId {} connected {}", steamId,now);
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1", "STEAM_0"));
         if (user != null) {
             user.setInMatch(true);
             if (user.getDisconnectDate() != null) {
-                final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
+                log.info("Last disconnect time [{}]",user.getDisconnectDate());
+                final Period period = this.dateService.periodBetwean(user.getDisconnectDate(),now);
                 final int disconnectDuration = period.getMinutes();
                 if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
                     user.setDisconnectDuration(0);
                     user.setDisconnectDate(null);
                     user.setAttempts(1);
                    // user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
-                    log.warn("User {} will be banned by UDP \n Time : [{}]", steamId, new Date());
+                    log.warn("User {} will be banned by UDP Duration : [{}]", steamId, disconnectDuration);
                 } else {
-                    user.setDisconnectDuration(disconnectDuration);
-                    log.warn("User {} disconnected for {} minutes", steamId, disconnectDuration);
+                    final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
+                    user.setDisconnectDuration(updatedDiscTime);
+                    log.warn("Update user disconnect time to {}", steamId, updatedDiscTime);
                 }
                 this.userRepository.save(user);
             }
