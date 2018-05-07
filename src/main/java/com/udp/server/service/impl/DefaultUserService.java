@@ -33,7 +33,6 @@ public class DefaultUserService implements UserService {
         if (user != null) {
             user.setInMatch(true);
             if (user.getDisconnectDate() != null) {
-                log.info("Last disconnect time [{}]",user.getDisconnectDate());
                 final Period period = this.dateService.periodBetwean(user.getDisconnectDate(),now);
                 final int disconnectDuration = period.getMinutes();
                 if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
@@ -45,7 +44,8 @@ public class DefaultUserService implements UserService {
                 } else {
                     final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
                     user.setDisconnectDuration(updatedDiscTime);
-                    log.warn("Update user {} disconnect time to {}", steamId, updatedDiscTime);
+                    user.setDisconnectDate(null);
+                    log.info("Update user {} disconnect time to {}", steamId, updatedDiscTime);
                 }
                 this.userRepository.save(user);
             }
@@ -60,7 +60,7 @@ public class DefaultUserService implements UserService {
             final Date now = new Date();
             user.setDisconnectDate(now);
             this.userRepository.save(user);
-            log.warn("User with steamId {} is disconnected Time : [{}]", steamId,now.toString());
+            log.warn("User with steamId {} is disconnected", steamId);
         }
         return user;
     }
