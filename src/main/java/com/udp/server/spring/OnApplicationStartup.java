@@ -1,4 +1,4 @@
-package com.udp.server.verticles;
+package com.udp.server.spring;
 
 import com.udp.server.service.UserService;
 import io.vertx.core.AbstractVerticle;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public final class OnApplicationStartVerticle extends AbstractVerticle {
+public final class OnApplicationStartup {
 
     private final UserService userService;
 
