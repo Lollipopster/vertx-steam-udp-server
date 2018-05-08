@@ -38,18 +38,11 @@ public class DefaultUserService implements UserService {
                 final Period period = this.dateService.periodBetwean(user.getDisconnectDate(),now);
                 final int disconnectDuration = period.getMinutes();
                 if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
-                    user.setDisconnectDuration(0);
-                    user.setDisconnectDate(null);
-                    user.setAttempts(1);
-                    user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
-                    log.warn("User {} will be banned by UDP Duration : [{}]", steamId, disconnectDuration);
+                    this.banUser(user,disconnectDuration);
                 } else {
-                    final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
-                    user.setDisconnectDuration(updatedDiscTime);
-                    user.setDisconnectDate(null);
-                    log.info("Update user {} disconnect time to {}", steamId, updatedDiscTime);
+                    this.updateBanTime(user,disconnectDuration);
                 }
-                this.userRepository.save(user);
+
             }
         }
         return user;
@@ -59,12 +52,33 @@ public class DefaultUserService implements UserService {
     public Users onDisconnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1", "STEAM_0"));
         if (user != null && user.isInMatch()) {
-            final Date now = new Date();
-            user.setDisconnectDate(now);
-            this.userRepository.save(user);
-            log.warn("User with steamId {} is disconnected", steamId);
+            this.logDisconnectInDb(user);
         }
         return user;
+    }
+
+    private void banUser(final Users user,final int disconnectDuration){
+        user.setDisconnectDuration(0);
+        user.setDisconnectDate(null);
+        user.setAttempts(1);
+        user.setLastTry(new Date(System.currentTimeMillis() + (2 * ONE_MINUTE_IN_MILLIS * 60)));
+        log.warn("User {} will be banned by UDP Duration : [{}]", user.getSteamId(), disconnectDuration);
+        this.userRepository.save(user);
+    }
+
+    private void updateBanTime(final Users user,final int disconnectDuration){
+        final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
+        user.setDisconnectDuration(updatedDiscTime);
+        user.setDisconnectDate(null);
+        log.info("Update user {} disconnect time to {}", user.getSteamId(), updatedDiscTime);
+        this.userRepository.save(user);
+    }
+
+    private void logDisconnectInDb(final Users user){
+        final Date now = new Date();
+        user.setDisconnectDate(now);
+        this.userRepository.save(user);
+        log.warn("User with steamId {} is disconnected", user.getSteamId());
     }
 
     @Override
