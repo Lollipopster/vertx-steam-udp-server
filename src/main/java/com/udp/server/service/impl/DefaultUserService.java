@@ -11,7 +11,9 @@ import org.joda.time.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -63,6 +65,11 @@ public class DefaultUserService implements UserService {
             log.warn("User with steamId {} is disconnected", steamId);
         }
         return user;
+    }
+
+    @Override
+    public void removeDisconnectTimeForUsers() {
+        this.userRepository.removeDisconnectTime();
     }
 
 }
