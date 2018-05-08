@@ -16,6 +16,5 @@ public final class OnApplicationStartVerticle extends AbstractVerticle {
     @EventListener
     public void execute(final ContextRefreshedEvent event) {
         this.userService.removeDisconnectTimeForUsers();
-        System.exit(666);
     }
 }
