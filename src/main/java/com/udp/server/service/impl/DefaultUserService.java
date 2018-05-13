@@ -11,9 +11,7 @@ import org.joda.time.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -40,7 +38,7 @@ public class DefaultUserService implements UserService {
                 if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
                     this.banUser(user,disconnectDuration);
                 } else {
-                    this.updateBanTime(user,disconnectDuration);
+                    this.updateDisconnectDuration(user,disconnectDuration);
                 }
 
             }
@@ -52,7 +50,7 @@ public class DefaultUserService implements UserService {
     public Users onDisconnectAction(final String steamId) {
         final Users user = this.userRepository.findBySteamId(steamId.replaceFirst("STEAM_1", "STEAM_0"));
         if (user != null && user.isInMatch()) {
-            this.logDisconnectInDb(user);
+            this.updateDisconnectDuration(user);
         }
         return user;
     }
@@ -66,7 +64,7 @@ public class DefaultUserService implements UserService {
         this.userRepository.save(user);
     }
 
-    private void updateBanTime(final Users user,final int disconnectDuration){
+    private void updateDisconnectDuration(final Users user, final int disconnectDuration){
         final int updatedDiscTime = user.getDisconnectDuration() + disconnectDuration;
         user.setDisconnectDuration(updatedDiscTime);
         user.setDisconnectDate(null);
@@ -74,7 +72,7 @@ public class DefaultUserService implements UserService {
         this.userRepository.save(user);
     }
 
-    private void logDisconnectInDb(final Users user){
+    private void updateDisconnectDuration(final Users user){
         final Date now = new Date();
         user.setDisconnectDate(now);
         this.userRepository.save(user);
