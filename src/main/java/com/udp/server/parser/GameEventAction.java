@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 @ParserQualifier(type = ParserQualifier.ParserType.GameEvent)
 @Slf4j
 public final class GameEventAction implements ParsedLogBody{
-    private static final String STEAM_ID_PATTERN = "STEAM.*[0-9]";
+    private static final String STEAM_ID_PATTERN = "STEAM_1:1:\\d{13}";
     @Override
     public JsonObject get(final String body) {
         if(body.contains("BOT")){
