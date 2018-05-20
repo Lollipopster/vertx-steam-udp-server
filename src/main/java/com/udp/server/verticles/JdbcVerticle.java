@@ -104,7 +104,17 @@ public final class JdbcVerticle extends AbstractVerticle implements CronJob{
             for (final JsonArray result : results) {
                 endedMatches.add(result.getInteger(0));
             }
-            final int i = this.matchService.endNewMatches(endedMatches);
+            this.vertx.<Integer>executeBlocking(future -> {
+                future.complete(this.matchService.endNewMatches(endedMatches));
+            },false, this::updateLastMatchId);
+        }
+    }
+
+    private void updateLastMatchId(final AsyncResult<Integer> result){
+        if(result.failed()){
+            log.error("Error while ended matches event ",result.cause());
+        } else{
+            final int i = result.result();
             if(i != 0){
                 this.lastMatchId = i;
             }
