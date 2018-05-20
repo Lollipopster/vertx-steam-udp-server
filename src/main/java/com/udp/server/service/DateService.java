@@ -9,4 +9,6 @@ public interface DateService {
     Period periodBetwean(Date dateFrom);
 
     Period periodBetwean(Date from,Date dateTo);
+
+    boolean isTimeLessThanNow(final Date date);
 }

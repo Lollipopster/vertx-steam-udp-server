@@ -21,4 +21,9 @@ public final class DefaultDateService implements DateService{
         final Interval interval = new Interval(from.getTime(),to.getTime());
         return interval.toPeriod();
     }
+
+    @Override
+    public boolean isTimeLessThanNow(final Date date) {
+        return date != null && date.compareTo(new Date()) < 0;
+    }
 }

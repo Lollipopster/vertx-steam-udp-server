@@ -106,13 +106,16 @@ public class DefaultMatchService implements MatchService {
         for (final Users user : users) {
             user.setInMatch(false);
             if (user.getLastTry() == null && user.getDisconnectDate() != null) {
-                final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
-                final int disconnectDuration = period.getMinutes();
-                if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
-                    this.banUser(user);
-                } else {
-                    this.clearDisconnectHistory(user);
+                if (this.dateService.isTimeLessThanNow(user.getDisconnectDate())) {
+                    final Period period = this.dateService.periodBetwean(user.getDisconnectDate());
+                    final int disconnectDuration = period.getMinutes();
+                    if (disconnectDuration >= UserService.DURATION_BEFORE_BAN) {
+                        this.banUser(user);
+                    } else {
+                        this.clearDisconnectHistory(user);
+                    }
                 }
+
             }
         }
         this.userRepository.save(users);
@@ -126,7 +129,7 @@ public class DefaultMatchService implements MatchService {
         log.warn("User {} will be banned by UDP when match is end Last disc time : []", user.getSteamId(), user.getDisconnectDate());
     }
 
-    private void clearDisconnectHistory(final Users user){
+    private void clearDisconnectHistory(final Users user) {
         user.setDisconnectDuration(0);
         user.setDisconnectDate(null);
     }
